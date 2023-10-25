@@ -1,0 +1,12 @@
+$ emconfigure configure \
+    --disable-all \
+    --disable-mbregex \
+    --disable-fiber-asm \
+    --disable-cli \
+    --disable-cgi \
+    --disable-phpdbg \
+    --without-iconv \
+    --without-libxml \
+    --without-pcre-jit \
+    --without-pdo-sqlite \
+    --without-sqlite3

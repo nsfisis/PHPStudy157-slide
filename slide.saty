@@ -5,12 +5,34 @@
 @require: code-printer/code-theme
 @require: figbox/figbox
 
-let-block +code-block-php source =
+let plain-syntax =
+  let void-rule = CodePrinter.syntax-rule-fun (fun _ -> None) in
+    CodePrinter.make-syntax (|
+      line-comment = void-rule;
+      block-comment = void-rule;
+      string = void-rule;
+      keywords = [];
+      identifier = void-rule;
+      others = [];
+    |)
+
+let config-of s =
+  CodePrinter.make-config s CodeTheme.iceberg-light
+    |> CodePrinter.set-number-fun CodeDesign.number-fun-null
+
+let-block +file-printer-js path =
   '<
-    +code-printer?:(
-      CodePrinter.make-config CodeSyntax.php CodeTheme.iceberg-light
-      |> CodePrinter.set-number-fun CodeDesign.number-fun-null
-    )(source);
+    +file-printer?:(config-of CodeSyntax.javascript)(path);
+  >
+
+let-block +file-printer-c path =
+  '<
+    +file-printer?:(config-of CodeSyntax.c)(path);
+  >
+
+let-block +file-printer path =
+  '<
+    +file-printer?:(config-of plain-syntax)(path);
   >
 
 open FigBox
@@ -50,23 +72,87 @@ document '<
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   +frame{任意コードを安全に実行したい}<
-    +p{TODO}
+    +p{任意の (危険かもしれない) コードを実行したい}
+  >
+
+  +frame{任意コードを安全に実行したい}<
+    +p{任意の (危険かもしれない) コードを実行したい}
+    +p{}
+    +p{WebAssembly による隔離}
   >
 
   +frame{WebAssembly とは}<
-    +p{TODO}
+    +p{ポータブルな仮想マシンのコード (別名 Wasm)}
+    +p{}
+    +p{元々はブラウザにおける処理の高速化を目的として制定されたが、さまざまなプラットフォームに活躍の場を広げつつある}
+    +p{}
+    +p{プラットフォームに依存しない、言語に依存しない、外から隔離された実行環境}
   >
 
   +frame{先行研究}<
-    +p{TODO}
+    +p{PHP の処理系を WebAssembly にコンパイル}
+    +p{}
+    +p{PHPerKaigi 2023: 「PHPをブラウザで動かす技術」}
+    +p{Zenn: 「WebAssemblyを使ったPHPのリアルタイムPlaygroundを作りました。」}
+    +p{WordPress Playground}
   >
 
   +frame{WebAssembly にビルドする}<
-    +p{TODO}
+    +p{C言語でエントリポイントを書く}
+
+    +file-printer-c(`files/php-wasm.c`);
+  >
+
+  +frame{Emscripten}<
+    +p{C 等から WebAssembly へのコンパイルに使用するツールチェイン}
+    +p{}
+    +p{LLVM を利用し、C や C++ などから WebAssembly のコードを生成する}
+  >
+
+  +frame{WebAssembly にビルドする}<
+    +file-printer(`files/1`);
+    +p{}
+    +p{PHP の通常のビルド手順}
+  >
+
+  +frame{WebAssembly にビルドする}<
+    +file-printer(`files/2`);
+    +p{}
+    +p{configure の代わりに emconfigure}
+    +p{make の代わりに emmake}
+  >
+
+  +frame{ビルドを楽にするために}<
+    +file-printer(`files/3`);
+    +p{なるべく disable/without して、ビルド対象を減らす}
+  >
+
+  +frame{ビルドを楽にするために}<
+    +file-printer(`files/4`);
+    +p{}
+    +p{\code(`ERROR_ON_UNDEFINED_SYMBOLS`); を 0 にして、未定義のシンボルがあってもエラーにならないように}
+  >
+
+  +frame{WebAssembly にビルドする}<
+    +file-printer(`files/5`);
+    +p{}
+    +p{\code(`ENVIRONMENT`); で動かす環境を指定、\code(`INITIAL_MEMORY`); で確保するメモリを指定、等}
+    +p{\code(`php-wasm.wasm`); と \code(`php-wasm.js`); が生成される}
+  >
+
+  +frame{使ってみる}<
+    +file-printer-js(`files/6`);
+    +p{}
+    +p{\code(`ccall`); に、関数名、返り値の型、仮引数の型、実引数を渡して呼び出す}
   >
 
   +frame{まとめ}<
-    +p{TODO}
+    +listing{
+      * Emscripten を使って、PHP の処理系を WebAssembly にコンパイルできる
+      * WebAssembly を使って、環境を隔離できる
+      * Git リポジトリ: https://github.com/nsfisis/tiny-php.wasm
+        ** Docker があれば構築可能
+    }
   >
 
 >

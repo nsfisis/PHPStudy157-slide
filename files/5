@@ -1,0 +1,9 @@
+$ emcc \
+    -s ERROR_ON_UNDEFINED_SYMBOLS=0 \
+    -s ENVIRONMENT=node \
+    -s INITIAL_MEMORY=16777216 \
+    -s EXPORT_ES6=1 \
+    -s INVOKE_RUN=0 \
+    -s MODULARIZE=1 \
+    -o php-wasm.js \
+    php-wasm.o libphp.a

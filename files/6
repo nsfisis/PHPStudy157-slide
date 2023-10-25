@@ -1,0 +1,9 @@
+import PHPWasm from './php-wasm.js'
+
+const { ccall } = await PHPWasm();
+const result = ccall(
+  'php_wasm_run',
+  'number', ['string'],
+  [`echo "Hello, World!";`],
+);
+console.log(`exit code: ${result}`);
